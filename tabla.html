@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title class="t1">Datos de la Tabla</title>
+        <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        h1{
+            text-align: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+    </style>
+    </head>
+    <body>
+        <h1>Datos de la Tabla</h1>
+        <table id="data-table">
+            <thead>
+                <tr>
+                    <th>AREAS</th>
+                    <th>FICHA</th>
+                    <th>ESPECIES</th>
+                    <th>UBICACION</th>
+                    <!-- Agrega más columnas según tu base de datos -->
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Los datos se cargarán aquí -->
+            </tbody>
+        </table>
+        <script>
+        // Función para cargar datos y mostrar la tabla
+        function loadData() {
+            fetch('https://tu-api-en-linea.com/datos') // URL de tu API de datos
+                .then(response => response.json())
+                .then(data => {
+                    const tableBody = document.querySelector('#data-table tbody');
+                    tableBody.innerHTML = ''; // Limpiar contenido existente
+                    data.forEach(item => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${item.id}</td>
+                            <td>${item.nombre}</td>
+                            <td>${item.correo}</td>
+                            <!-- Agrega más columnas según tu base de datos -->
+                        `;
+                        tableBody.appendChild(row);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error al cargar los datos:', error);
+                });
+        }
+
+        // Cargar datos al cargar la página
+        document.addEventListener('DOMContentLoaded', loadData);
+    </script>
+    </body>
+</html>

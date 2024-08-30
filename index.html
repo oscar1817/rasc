@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Sistema de Notificaciones</title>
+    </head>
+    <body>
+        <h1>Cliente de Notificaciones</h1>
+        <button onclick="registerDevice()">Registrar Dispositivo</button>
+        <div id="status"></div>
+
+        <script>
+        let socket;
+        let deviceId;
+
+        function generateDeviceId() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+
+        function registerDevice() {
+            deviceId = localStorage.getItem('deviceId');
+            if (!deviceId) {
+                deviceId = generateDeviceId();
+                localStorage.setItem('deviceId', deviceId);
+            }
+
+            socket = new WebSocket('ws://localhost:8765');
+
+            socket.onopen = function(e) {
+                console.log('Conectado al servidor');
+                socket.send(JSON.stringify({
+                    action: 'register', 
+                    device_id: deviceId,
+                    fcm_token: 'simulate-fcm-token-here' // Simula un token FCM
+                }));
+                document.getElementById('status').textContent = 'Conectado y registrado';
+            };
+
+            socket.onmessage = function(event) {
+                const notification = JSON.parse(event.data);
+                showNotification(notification.title, notification.body);
+            };
+
+            socket.onclose = function(event) {
+                console.log('Desconectado del servidor');
+                document.getElementById('status').textContent = 'Desconectado';
+            };
+        }
+
+        function showNotification(title, body) {
+            if (!("Notification" in window)) {
+                alert("Este navegador no soporta notificaciones de escritorio");
+            } else if (Notification.permission === "granted") {
+                new Notification(title, {body: body});
+            } else if (Notification.permission !== "denied") {
+                Notification.requestPermission().then(function (permission) {
+                    if (permission === "granted") {
+                        new Notification(title, {body: body});
+                    }
+                });
+            }
+        }
+    </script>
+    </body>
+</html>
